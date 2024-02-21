@@ -1,4 +1,6 @@
 import express from "express";
+import { check } from "express-validator";
+
 import {
   createPlace,
   deletePlace,
@@ -14,11 +16,23 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", getPlaceById);
-router.patch("/:id", updatePlace);
+router.patch(
+  "/:id",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
+  updatePlace
+);
 router.delete("/:id", deletePlace);
 
 router.get("/user/:id", getPlacesByUserId);
 
-router.post("/", createPlace);
+router.post(
+  "/",
+  [
+    check("title").not().isEmpty(),
+    check("description").isLength({ min: 5 }),
+    check("address").not().isEmpty(),
+  ],
+  createPlace
+);
 
 export default router;
