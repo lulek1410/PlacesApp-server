@@ -4,6 +4,7 @@ import placesRoutes from "./routes/places.js";
 import usersRouter from "./routes/users.js";
 
 import { HttpError } from "./models/http-errors.js";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -25,4 +26,7 @@ app.use((error, req, res, next) => {
     .json({ message: error.message || "An unknown error occurred!" });
 });
 
-app.listen(5000);
+mongoose
+  .connect("mongodb+srv://Janek:MnqYcUz4bc7mncC2@cluster0.7tr11tj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+  .then(() => app.listen(5000))
+  .catch((err) => console.log(err));
