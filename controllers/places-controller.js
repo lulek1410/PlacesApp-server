@@ -119,7 +119,9 @@ export const createPlace = async (req, res, next) => {
 export const updatePlace = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid input passed, please check your data", 422);
+    return next(
+      new HttpError("Invalid input passed, please check your data", 422)
+    );
   }
 
   const id = req.params.id;
