@@ -4,48 +4,8 @@ import { validationResult } from "express-validator";
 import { HttpError } from "../models/http-errors.js";
 import { getCoordsForAddress } from "../util/location.js";
 import { Place } from "../models/place.js";
-
-let DUMMY_PLACES = [
-  {
-    id: "1",
-    title: "Empire state building",
-    description:
-      "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Praesentium provident culpa fugit eveniet quidem ut eligendi vitae earum incidunt repellendus facilis nam blanditiis quo adipisci iste, fuga maiores, accusamus corrupti?",
-    image: "https://media.timeout.com/images/101705309/image.jpg",
-    address: "20 W 34th St., New York, NY 10001, United States",
-    location: {
-      lat: 40.7484445,
-      lng: -73.9882447,
-    },
-    creator: "1",
-  },
-  {
-    id: "2",
-    title: "Empire state building",
-    description:
-      "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Praesentium provident culpa fugit eveniet quidem ut eligendi vitae earum incidunt repellendus facilis nam blanditiis quo adipisci iste, fuga maiores, accusamus corrupti?",
-    image: "https://media.timeout.com/images/101705309/image.jpg",
-    address: "20 W 34th St., New York, NY 10001, United States",
-    location: {
-      lat: 40.7484445,
-      lng: -73.9882447,
-    },
-    creator: "1",
-  },
-  {
-    id: "3",
-    title: "Emp. state building",
-    description:
-      "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Praesentium provident culpa fugit eveniet quidem ut eligendi vitae earum incidunt repellendus facilis nam blanditiis quo adipisci iste, fuga maiores, accusamus corrupti?",
-    image: "https://media.timeout.com/images/101705309/image.jpg",
-    address: "20 W 34th St., New York, NY 10001, United States",
-    location: {
-      lat: 40.7484445,
-      lng: -73.9882447,
-    },
-    creator: "1",
-  },
-];
+import { User } from "../models/user.js";
+import { startSession } from "mongoose";
 
 export const getPlaceById = async (req, res, next) => {
   const id = req.params.id;
@@ -71,7 +31,6 @@ export const getPlacesByUserId = async (req, res, next) => {
   try {
     place = await Place.find({ creator: id });
   } catch (err) {
-    console.log(err);
     return next(new HttpError("Something went wrong, could not find places."));
   }
   if (!place) {
@@ -98,6 +57,17 @@ export const createPlace = async (req, res, next) => {
     return next(error);
   }
 
+  let user;
+  try {
+    user = await User.findById(creator);
+  } catch (err) {
+    return next(new HttpError("Creating place failed, please try again.", 500));
+  }
+
+  if (!user) {
+    return next(new HttpError("Could not find user for provided id", 404));
+  }
+
   const createdPlace = new Place({
     title,
     description,
@@ -106,8 +76,14 @@ export const createPlace = async (req, res, next) => {
     image: "https://media.timeout.com/images/101705309/image.jpg",
     creator,
   });
+
   try {
-    await createdPlace.save();
+    const session = await startSession();
+    session.startTransaction();
+    await createdPlace.save({ session });
+    user.places.push(createdPlace);
+    await user.save({ session });
+    await session.commitTransaction();
   } catch (err) {
     console.log(err);
     return next(new HttpError("Creating place failed, please try again.", 500));
@@ -133,7 +109,6 @@ export const updatePlace = async (req, res) => {
       { title, description },
       { returnDocument: "after" }
     );
-    console.log(updatedPlace);
   } catch (err) {
     return next(
       new HttpError("Something went wrong, could not update place", 500)

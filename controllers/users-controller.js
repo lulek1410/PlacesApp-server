@@ -32,7 +32,7 @@ export const signup = async (req, res, next) => {
     );
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
   let existingUser;
   try {
     existingUser = await User.findOne({ email });
@@ -52,7 +52,7 @@ export const signup = async (req, res, next) => {
     image:
       "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?cs=srgb&dl=pexels-pixabay-220453.jpg&fm=jpg",
     password,
-    places,
+    places: [],
   });
 
   try {
