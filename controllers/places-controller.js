@@ -118,16 +118,31 @@ export const updatePlace = async (req, res) => {
   res.status(200).json(updatedPlace.toObject({ getters: true }));
 };
 
-export const deletePlace = async (req, res) => {
+export const deletePlace = async (req, res, next) => {
   const id = req.params.id;
-  let place;
+  let session;
   try {
-    place = await Place.findByIdAndDelete(id);
+    session = await startSession();
+    session.startTransaction();
+    const place = await Place.findById(id).populate("creator");
+    if (!place) {
+      return next(new HttpError("Could not find place for provided id.", 404));
+    }
+    place.creator.places.pull(place);
+    await place.creator.save({ session });
+    await Place.findByIdAndDelete(id, { session });
+    await session.commitTransaction();
   } catch (err) {
+    if (session) {
+      await session.abortTransaction();
+    }
     return next(
-      new HttpError("Something went wrong, could not fond place.", 500)
+      new HttpError("Something went wrong, could not find place.", 500)
     );
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
-
   res.status(200).json({ message: `Place with id:${id} has been deleted` });
 };
