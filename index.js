@@ -27,6 +27,8 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect("mongodb+srv://Janek:MnqYcUz4bc7mncC2@cluster0.7tr11tj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+  .connect(
+    "mongodb+srv://Janek:MnqYcUz4bc7mncC2@cluster0.7tr11tj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
   .then(() => app.listen(5000))
   .catch((err) => console.log(err));

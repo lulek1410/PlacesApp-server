@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
 import { validationResult } from "express-validator";
 
+import { startSession } from "mongoose";
 import { HttpError } from "../models/http-errors.js";
-import { getCoordsForAddress } from "../util/location.js";
 import { Place } from "../models/place.js";
 import { User } from "../models/user.js";
-import { startSession } from "mongoose";
+import { getCoordsForAddress } from "../util/location.js";
 
 export const getPlaceById = async (req, res, next) => {
   const id = req.params.id;

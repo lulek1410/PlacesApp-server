@@ -1,16 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
-import { HttpError } from "../models/http-errors.js";
 import { validationResult } from "express-validator";
+import { HttpError } from "../models/http-errors.js";
 import { User } from "../models/user.js";
-
-let DUMMY_USERS = [
-  {
-    id: "1",
-    name: "Mike Shwartz",
-    email: "test@test.com",
-    password: "test",
-  },
-];
 
 export const getUsers = async (req, res, next) => {
   let users;
