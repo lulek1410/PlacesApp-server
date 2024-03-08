@@ -51,7 +51,7 @@ export const signup = async (req, res, next) => {
     return next(HttpError("Sign up failed, please try again later.", 500));
   }
 
-  res.status(201).json(newUser.toObject({ getters: true }));
+  res.status(201).json({ userId: newUser.toObject({ getters: true }).id });
 };
 
 export const login = async (req, res, next) => {
@@ -67,5 +67,8 @@ export const login = async (req, res, next) => {
     return next(new HttpError("Invalid credentials, could not log in", 402));
   }
 
-  res.status(200).json({ message: "Logged in succesfully" });
+  res.status(200).json({
+    message: "Logged in succesfully",
+    userId: existingUser.toObject({ getters: true }).id,
+  });
 };
