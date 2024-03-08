@@ -91,7 +91,7 @@ export const createPlace = async (req, res, next) => {
   res.status(201).json({ createdPlace });
 };
 
-export const updatePlace = async (req, res) => {
+export const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
