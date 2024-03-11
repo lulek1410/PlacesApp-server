@@ -5,10 +5,14 @@ import usersRouter from "./routes/users.js";
 
 import { HttpError } from "./models/http-errors.js";
 import mongoose from "mongoose";
+import { unlink } from "fs";
+import path from "path";
 
 const app = express();
 
 app.use(express.json());
+
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -28,6 +32,11 @@ app.use((req, res) => {
 });
 
 app.use((error, req, res, next) => {
+  if (req.file) {
+    unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
   if (res.headersSent) {
     return next(error);
   }

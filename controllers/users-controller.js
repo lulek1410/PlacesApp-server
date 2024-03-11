@@ -26,7 +26,6 @@ export const signup = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ email });
-    console.log(existingUser);
   } catch (err) {
     return next(HttpError("Sign up failed, please try again later.", 500));
   }
@@ -39,8 +38,7 @@ export const signup = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
-    image:
-      "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?cs=srgb&dl=pexels-pixabay-220453.jpg&fm=jpg",
+    image: req.file.path,
     password,
     places: [],
   });
@@ -59,7 +57,6 @@ export const login = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ email });
-    console.log(existingUser);
   } catch (err) {
     return next(HttpError("Log in failed, please try again later.", 500));
   }

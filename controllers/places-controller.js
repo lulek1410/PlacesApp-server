@@ -84,7 +84,6 @@ export const createPlace = async (req, res, next) => {
     await user.save({ session });
     await session.commitTransaction();
   } catch (err) {
-    console.log(err);
     return next(new HttpError("Creating place failed, please try again.", 500));
   }
 
