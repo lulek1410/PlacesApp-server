@@ -5,6 +5,7 @@ import { HttpError } from "../models/http-errors.js";
 import { Place } from "../models/place.js";
 import { User } from "../models/user.js";
 import { getCoordsForAddress } from "../util/location.js";
+import { unlink } from "fs";
 
 export const getPlaceById = async (req, res, next) => {
   const id = req.params.id;
@@ -72,7 +73,7 @@ export const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image: "https://media.timeout.com/images/101705309/image.jpg",
+    image: req.file.path,
     creator,
   });
 
@@ -119,6 +120,7 @@ export const updatePlace = async (req, res, next) => {
 export const deletePlace = async (req, res, next) => {
   const id = req.params.id;
   let session;
+  let imagePath;
   try {
     session = await startSession();
     session.startTransaction();
@@ -126,14 +128,14 @@ export const deletePlace = async (req, res, next) => {
     if (!place) {
       return next(new HttpError("Could not find place for provided id.", 404));
     }
+
+    imagePath = place.image;
+
     place.creator.places.pull(place);
     await place.creator.save({ session });
     await Place.findByIdAndDelete(id, { session });
     await session.commitTransaction();
   } catch (err) {
-    if (session) {
-      await session.abortTransaction();
-    }
     return next(
       new HttpError("Something went wrong, could not find place.", 500)
     );
@@ -142,5 +144,10 @@ export const deletePlace = async (req, res, next) => {
       session.endSession();
     }
   }
+
+  unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   res.status(200).json({ message: `Place with id:${id} has been deleted` });
 };
