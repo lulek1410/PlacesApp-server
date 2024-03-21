@@ -9,7 +9,7 @@ import {
   updatePlace,
 } from "../controllers/places-controller.js";
 import { fileUpload } from "../middleware/file-upload.js";
-import { auth } from "../models/auth.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
