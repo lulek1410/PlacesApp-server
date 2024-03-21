@@ -38,8 +38,9 @@ export const signup = async (req, res, next) => {
     );
   }
 
+  let hashedPassword;
   try {
-    const hashedPassword = await bcrypt.hash(password, 12);
+    hashedPassword = await bcrypt.hash(password, 12);
   } catch (error) {
     return next(new HttpError("Could not create user, please try again.", 500));
   }

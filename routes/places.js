@@ -9,22 +9,21 @@ import {
   updatePlace,
 } from "../controllers/places-controller.js";
 import { fileUpload } from "../middleware/file-upload.js";
+import { auth } from "../models/auth.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({ message: "It works!" });
-});
-
 router.get("/:id", getPlaceById);
+router.get("/user/:id", getPlacesByUserId);
+
+router.use(auth);
+
 router.patch(
   "/:id",
   [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
   updatePlace
 );
 router.delete("/:id", deletePlace);
-
-router.get("/user/:id", getPlacesByUserId);
 
 router.post(
   "/",
