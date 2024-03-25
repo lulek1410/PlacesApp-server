@@ -31,7 +31,7 @@ export const getPlacesByUserId = async (req, res, next) => {
   try {
     place = await Place.find({ creator: id });
   } catch (err) {
-    return next(new HttpError("Something went wrong, could not find places."));
+    return next(new HttpError("Something went wrong, could not find places.", 500));
   }
   if (!place) {
     return next(

@@ -91,7 +91,8 @@ export const login = async (req, res, next) => {
   } catch (error) {
     return next(
       new HttpError(
-        "Could not log in, please check your credentials and try again."
+        "Could not log in, please check your credentials and try again.",
+        400
       )
     );
   }
